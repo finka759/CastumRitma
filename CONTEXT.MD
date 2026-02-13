@@ -1,3 +1,30 @@
+# 🎙 Проект: Castum Ritma — Статус "Диплом" (Конец Сессии 3)
+
+## ✅ Текущие достижения (Core)
+- **Architecture:** Single Activity, Clean Architecture (Data/Domain/UI), Koin DI.
+- **UI:** SearchScreen (Cards), DetailsScreen (Episodes), PlayerScreen (Media3).
+- **L10n:** Поддержка RU/EN, темная/светлая темы (M3).
+- **Playback:** Работающий стриминг через Media3 Service в фоне.
+
+## 📋 Соответствие дипломным требованиям
+- [x] Работа с удаленным сервером (iTunes API).
+- [x] Карточки объектов (LazyColumn + Cards).
+- [x] Переход к детальному виду.
+- [x] Локализация (RU/EN).
+- [ ] Экран настроек (Выбор языка/темы) — **В ПЛАНЕ**.
+- [ ] Offline режим (Room caching) — **В ПЛАНЕ**.
+- [ ] Unit Test — **В ПЛАНЕ**.
+- [ ] CI Github Actions — **В ПЛАНЕ**.
+
+## 🚀 План на Сессию 4: "Настройки и Оффлайн"
+1. **SettingsScreen:** Реализация экрана настроек (Язык, Тема).
+2. **Room Integration:** Кэширование эпизодов для Offline-доступа.
+3. **Unit Testing:** Тестирование логики маппинга данных.
+4. **CI Setup:** Настройка Github Actions для проверки билда.
+
+
+
+
 🎙 Проект: Castum Ritma — Статус «Дипломный стандарт» (Конец Сессии 3)
 ✅ Текущий прогресс по критериям
 Single Activity: Полная реализация на Jetpack Compose. Навигация через NavHost.
@@ -47,6 +74,57 @@ CI/CD:
 
 
 
+# 🎙 Проект: Castum Ritma — Точка сохранения (Конец Сессии 3)
+
+## ✅ Текущий статус
+- **DI (Koin):** Полная настройка `AppModule` и `PlayerModule`. Используются `viewModelOf` и `singleOf` для автоматического внедрения зависимостей. `PlayerViewModel` работает как синглтон, обеспечивая непрерывное воспроизведение.
+- **Media3 (Playback):** Реализован `PlaybackService` (MediaSessionService). Настроен `ExoPlayer` с поддержкой Audio Focus. В манифесте разрешен трафик `cleartext` (HTTP) и прописаны Foreground permissions.
+- **Navigation:** Настроен `NavHost` с маршрутами `Search`, `Details` и `Player`. Реализован паттерн "Shared State" через `PlayerViewModel` для передачи данных эпизода без сложной сериализации.
+- **UI:**
+    - `DetailsScreen` отображает список эпизодов и передает клик в навигацию.
+    - `PlayerScreen` отображает обложку, название и управляет состоянием Play/Pause.
+    - Добавлены расширенные иконки Material (Pause/PlayArrow).
+
+## 📁 Ключевые файлы (Session 3)
+- `di/AppModule.kt` — Репозитории и ВьюМодели.
+- `data/playback/PlaybackService.kt` — Сервис фонового звука.
+- `ui/navigation/AppNavigation.kt` — Логика переходов и связи VM.
+- `ui/viewmodels/PlayerViewModel.kt` — Центр управления ExoPlayer.
+
+## 🛠 Код-стейт (PlayerViewModel.kt)
+```kotlin
+class PlayerViewModel(private val player: ExoPlayer) : ViewModel() {
+    private val _isPlaying = MutableStateFlow(false)
+    val isPlaying = _isPlaying.asStateFlow()
+
+    private val _currentEpisode = MutableStateFlow<Episode?>(null)
+    val currentEpisode = _currentEpisode.asStateFlow()
+
+    init {
+        player.addListener(object : Player.Listener {
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                _isPlaying.value = isPlaying
+            }
+        })
+    }
+
+    fun loadAndPlay(episode: Episode) {
+        if (player.currentMediaItem?.mediaId == episode.audioUrl) return
+        _currentEpisode.value = episode
+        val mediaItem = MediaItem.Builder()
+            .setMediaId(episode.audioUrl)
+            .setUri(Uri.parse(episode.audioUrl))
+            .setMediaMetadata(MediaMetadata.Builder().setTitle(episode.title).build())
+            .build()
+        player.setMediaItem(mediaItem)
+        player.prepare()
+        player.play()
+    }
+
+    fun togglePlayPause() {
+        if (player.isPlaying) player.pause() else player.play()
+    }
+}
 
 
 

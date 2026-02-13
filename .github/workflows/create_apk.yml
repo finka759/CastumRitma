@@ -1,0 +1,64 @@
+name: CI/CD Castum Ritma
+
+# Триггеры: запускать при любом пуше во все ветки и при Pull Request-ах
+on:
+  push:
+    branches: '*'
+  pull_request:
+    branches: '*'
+
+jobs:
+  build:
+    # Используем свежую версию виртуальной машины Ubuntu
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Копируем исходный код проекта в виртуальную машину
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Устанавливаем среду Java (JDK 17 — стандарт для современного Android)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin' # Рекомендуемый дистрибутив OpenJDK
+          cache: gradle           # Кэширование зависимостей ускоряет сборку в разы
+
+      # 3. Безопасность: Создаем пустой файл local.properties, чтобы Gradle не выдал ошибку
+      # В этом файле на твоем ПК лежат API-ключи, но на GitHub их нет.
+      - name: Create empty local.properties
+        run: touch local.properties
+
+      # 4. Работа с секретами: Декодируем конфиг Firebase (если он у тебя будет)
+      # Значение FIREBASE_SECRET нужно заранее добавить в Settings -> Secrets -> Actions на GitHub
+      - name: Decode google-services.json
+        env:
+          FIREBASE_SECRET: ${{ secrets.FIREBASE_SECRET }}
+        run: |
+          if [ -z "$FIREBASE_SECRET" ]; then
+            echo "Firebase secret is empty, skipping..."
+            echo "{}" > ./app/google-services.json
+          else
+            echo $FIREBASE_SECRET > ./app/google-services.json
+          fi
+
+      # 5. Права доступа: Разрешаем системе выполнять скрипт сборки Gradle
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # 6. ТРЕБОВАНИЕ ДИПЛОМА: Запуск Unit-тестов
+      # Если хотя бы один тест упадет, билд на GitHub станет красным
+      - name: Run Unit Tests
+        run: ./gradlew testDebugUnitTest
+
+      # 7. Сборка APK: Компиляция приложения в Debug-режиме
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
+
+      # 8. Артефакты: Сохраняем готовый APK файл, чтобы его можно было скачать прямо с GitHub
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CastumRitma-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
