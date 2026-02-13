@@ -30,8 +30,6 @@ class MappersTest {
 
         assertEquals(123L, domain.id)
         assertEquals("Test Episode", domain.title)
-        // ВНИМАНИЕ: Проверь, что твой маппер реально выдает "1:00" или "1 min"
-        // Если маппер выдает "01:00", то замени строку ниже на "01:00"
         assertEquals("1:00", domain.duration)
     }
 
