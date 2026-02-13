@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CastumRitma</string>
+    <string name="episodes_title">Эпизоды подкаста</string>
+    <string name="unknown_author">Неизвестный автор</string>
+    <string name="no_description">Описание отсутствует</string>
+    <string name="duration_label">Длительность: %s</string>
+    <string name="no_title">Без названия</string>
+</resources>

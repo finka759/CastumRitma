@@ -1,0 +1,39 @@
+# Заглушки сборки
+*.iml
+.gradle
+/build
+/captures
+
+# Настройки IDE (Android Studio / IntelliJ)
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+/.idea/caches
+# Дополнительно для новых версий студии:
+/.idea/deploymentTargetDropDown.xml
+/.idea/kotlinc.xml
+/.idea/vcs.xml
+/.idea/misc.xml
+/.idea/gradle.xml
+
+# Секреты и локальные конфиги (КРИТИЧНО)
+local.properties
+.stacktrace
+signing/
+# Если использовать Google Services:
+google-services.json
+
+# Система и кэш
+.DS_Store
+.externalNativeBuild
+.cxx
+*.pyc
+__pycache__/
+
+# Log файлы
+*.log
+
+# Файлы устройства (скриншоты, записи экрана)
+captures/

@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">CastumRitma</string>
+    <string name="episodes_title">Podcast episodes</string>
+    <string name="unknown_author">Unknown author</string>
+    <string name="no_description">No description available</string>
+    <string name="duration_label">Duration: %s</string>
+    <string name="no_title">No Title</string>
+</resources>
