@@ -20,7 +20,7 @@ class DetailsViewModel(
             try {
                 // Здесь будет вызов репозитория, который дернет API
                 val result = repository.fetchEpisodes(id)
-                _episodes.value = result
+                _episodes.value = result.filter { it.audioUrl.isNotBlank() }//берем эпизоды только имеющие url
             } catch (e: Exception) {
                 // Обработка ошибки
             }

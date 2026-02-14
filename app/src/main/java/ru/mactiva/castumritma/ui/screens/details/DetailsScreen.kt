@@ -1,5 +1,6 @@
 package ru.mactiva.castumritma.ui.screens.details
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -15,7 +16,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,6 +37,7 @@ import org.koin.androidx.compose.koinViewModel
 import ru.mactiva.castumritma.R
 import ru.mactiva.castumritma.domain.Episode
 import ru.mactiva.castumritma.ui.viewmodels.DetailsViewModel
+import ru.mactiva.castumritma.ui.viewmodels.PlayerViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,7 +47,11 @@ fun DetailsScreen(
     onBack: () -> Unit,
     onEpisodeClick: (Episode) -> Unit // Добавляем этот callback
 ) {
-// 1. Запускаем загрузку эпизодов при первом запуске экрана
+    // для подсветки проигрываемого эпизода
+    val playerVm: PlayerViewModel = koinViewModel()
+    val currentPlaying by playerVm.currentEpisode.collectAsState()
+
+// Запускаем загрузку эпизодов при первом запуске экрана
     LaunchedEffect(collectionId) {
         viewModel.loadEpisodes(collectionId)
     }
@@ -81,8 +89,10 @@ fun DetailsScreen(
                     .fillMaxSize()
             ) {
                 items(episodes) { episode ->
+                    val isActive = currentPlaying?.id != null && episode.id == currentPlaying?.id
                     EpisodeItem(
                         episode = episode,
+                        isActive = isActive, // Передаем флаг
                         onClick = { onEpisodeClick(episode) } // Вызываем при клике
                     )
                 }
@@ -92,14 +102,19 @@ fun DetailsScreen(
 }
 
 @Composable
-fun EpisodeItem(episode: Episode, onClick: () -> Unit) {
+fun EpisodeItem(episode: Episode, isActive: Boolean, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             // ДОБАВЛЕНО: Теперь вся карточка кликабельна
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        colors = CardDefaults.cardColors(
+            // Если активен — подсвечиваем цветом бренда
+            containerColor = if (isActive) MaterialTheme.colorScheme.primaryContainer
+            else MaterialTheme.colorScheme.surfaceVariant
+        ),
+        border = if (isActive) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
     ) {
         Row(
             modifier = Modifier
@@ -154,6 +169,14 @@ fun EpisodeItem(episode: Episode, onClick: () -> Unit) {
                         Text(
                             text = stringResource(R.string.duration_label, duration),
                             style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+                    if (isActive) {
+                        Icon(
+                            imageVector = Icons.Default.VolumeUp, // Иконка динамика
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(end = 8.dp)
                         )
                     }
                 }

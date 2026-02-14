@@ -12,7 +12,9 @@ import ru.mactiva.castumritma.data.repository.PodcastRepositoryImpl
 import ru.mactiva.castumritma.ui.viewmodels.SearchViewModel
 import ru.mactiva.castumritma.ui.viewmodels.DetailsViewModel
 import ru.mactiva.castumritma.ui.viewmodels.PlayerViewModel
+import ru.mactiva.castumritma.ui.viewmodels.SettingsViewModel
 import ru.mactiva.castumritma.utils.Constants
+
 
 val appModule = module {
     // Network: Retrofit & API
@@ -28,6 +30,7 @@ val appModule = module {
     single<PodcastRepository> { PodcastRepositoryImpl(get()) }
     // Player: Объявляем как single, чтобы он был "вечным"
     singleOf(::PlayerViewModel)
+    singleOf(::SettingsViewModel)
 
     // ViewModels
     viewModelOf(::SearchViewModel)

@@ -5,4 +5,13 @@
     <string name="no_description">No description available</string>
     <string name="duration_label">Duration: %s</string>
     <string name="no_title">No Title</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="theme_setting">Dark Theme</string>
+    <string name="language_setting">App Language</string>
+    <string name="lang_ru">Russian</string>
+    <string name="lang_en">English</string>
+    <string name="back_button">Back</string>
+    <string name="search_hint">Search podcasts</string>
 </resources>
